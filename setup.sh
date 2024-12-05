@@ -47,13 +47,11 @@ elif [ "$distro" -eq 0 ]; then
     
     # Chromedriver installieren
     echo "Installing Chromedriver..."
-    CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9.]+' | head -n 1)
-    CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-    wget "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+    wget https://chromedriver.storage.googleapis.com/92.0.4515.107/chromedriver_linux64.zip
     unzip chromedriver_linux64.zip
-    sudo mv chromedriver /usr/local/bin/
-    chmod +x /usr/local/bin/chromedriver
-    rm chromedriver_linux64.zip
+    sudo mv chromedriver /sbin/chromedriver
+    sudo chown root:root /sbin/chromedriver
+    sudo chmod +x /sbin/chromedriver
 
 else
     echo "Ungültige Eingabe. Bitte 1 oder 0 eingeben."

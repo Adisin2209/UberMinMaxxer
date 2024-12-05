@@ -83,7 +83,7 @@ public class Main {
         seleniumLogger.setLevel(Level.SEVERE);
 
 
-        System.setProperty("webdriver.chrome.driver", "/sbin/chromedriver");
+       // System.setProperty("webdriver.chrome.driver", "/sbin/chromedriver");
         driver = new ChromeDriver();
     }
 

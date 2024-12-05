@@ -43,3 +43,9 @@ elif [ "$distro" -eq 0 ]; then
 else
     echo "Ungültige Eingabe. Bitte 1 oder 0 eingeben."
 fi
+
+# mvn package clean ausführen
+echo "Running 'mvn package clean'..."
+mvn clean package
+
+echo "Installation complete."

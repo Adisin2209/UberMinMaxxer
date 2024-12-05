@@ -13,7 +13,23 @@ read -r distro
 
 # Abhängig von der Eingabe die entsprechende Aktion ausführen
 if [ "$distro" -eq 1 ]; then
+    
     echo "Installing dependencies for Arch Linux..."
+    
+    # Überprüfen, ob yay installiert ist
+    if ! command -v yay &> /dev/null; then
+        echo "yay is not installed. Installing yay..."
+        
+        # yay installieren
+        sudo pacman -S --needed git base-devel
+        git clone https://aur.archlinux.org/yay.git
+        cd yay || exit
+        makepkg -si --noconfirm
+        cd .. || exit
+        rm -rf yay
+    else
+        echo "yay is already installed."
+    fi
     
     # OpenJDK installieren
     echo "Installing OpenJDK..."

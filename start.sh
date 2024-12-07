@@ -1,16 +1,19 @@
 #!/bin/bash
 
-# Git-Repository-URL (ersetzen mit deinem Repository-URL)
-REPO_URL="https://github.com/dein-benutzername/dein-repository.git"
+# Ermittle das Verzeichnis, in dem sich dieses Skript befindet
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Pfad zum lokalen Git-Repository
-REPO_PATH="."
+# Git-Repository-URL
+REPO_URL="https://github.com/Adisin2209/UberMinMaxxer.git"
 
-CLEAN_START_SCRIPT="./cleanstart.sh"
+# Lokaler Pfad zum Git-Repository
+REPO_PATH="$SCRIPT_DIR"
+
+# Pfade zur JAR-Datei und zum CleanStart-Skript
+JAR_PATH="$SCRIPT_DIR/target/Uber_Minmaxxer-1.0-SNAPSHOT-jar-with-dependencies.jar"
+CLEAN_START_SCRIPT="$SCRIPT_DIR/cleanstart.sh"
 
 # Überprüfen, ob die JAR-Datei existiert
-JAR_PATH="target/Uber_Minmaxxer-1.0-SNAPSHOT-jar-with-dependencies.jar"
-
 if [ ! -f "$JAR_PATH" ]; then
     echo "Fehler: Die Datei $JAR_PATH wurde nicht gefunden."
     if [ -f "$CLEAN_START_SCRIPT" ]; then
@@ -22,21 +25,19 @@ if [ ! -f "$JAR_PATH" ]; then
     exit 1
 fi
 
-
-
 # Prüfen, ob lokale und Remote-Version übereinstimmen
 echo "Überprüfe auf Updates..."
-git -C $REPO_PATH fetch origin
+git -C "$REPO_PATH" fetch origin
 
-LOCAL_COMMIT=$(git -C $REPO_PATH rev-parse HEAD)
-REMOTE_COMMIT=$(git -C $REPO_PATH rev-parse origin/main)
+LOCAL_COMMIT=$(git -C "$REPO_PATH" rev-parse HEAD)
+REMOTE_COMMIT=$(git -C "$REPO_PATH" rev-parse origin/main)
 
 if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     echo "Neue Version verfügbar. Update jetzt? [y/N]"
     read -r UPDATE_CHOICE
     if [[ "$UPDATE_CHOICE" =~ ^[Yy]$ ]]; then
         echo "Hole die neuesten Änderungen..."
-        git -C $REPO_PATH pull origin main
+        git -C "$REPO_PATH" pull origin main
         echo "Update abgeschlossen."
 
         # Starte CleanStart-Skript nach dem Update

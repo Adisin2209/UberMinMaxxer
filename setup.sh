@@ -55,6 +55,19 @@ elif [ "$distro" -eq 0 ]; then
     # Maven installieren
     sudo apt install -y maven wget unzip
     
+    # Überprüfen, ob pip installiert ist
+    if ! command -v pip &> /dev/null; then
+        echo "pip is not installed. Do you want to install pip? [Y/n]"
+        read -r install_pip
+        if [[ "$install_pip" =~ ^[Yy]$ || -z "$install_pip" ]]; then
+            sudo apt install -y python3-pip
+        else
+            echo "pip installation skipped. Chromedriver installation might fail."
+        fi
+    else
+        echo "pip is already installed."
+    fi
+    
     # Google Chrome installieren
     echo "Installing Google Chrome..."
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -81,6 +94,18 @@ fi
 # mvn package clean ausführen
 echo "Running 'mvn clean package'..."
 mvn clean package
+
+# Fragen, ob 'umm' zum PATH hinzugefügt werden soll
+echo ""
+echo "Do you want to add 'umm' (UberMinmaxxer) to path? [Y/n]"
+read -r add_to_path
+
+if [[ "$add_to_path" =~ ^[Yy]$ || -z "$add_to_path" ]]; then
+    echo "Adding 'umm' to path..."
+    ./addtopath.sh
+else
+    echo "'umm' was not added to path."
+fi
 
 echo "Installation complete."
 

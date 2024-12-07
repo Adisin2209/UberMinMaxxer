@@ -58,7 +58,7 @@ public class Main {
 
     public static void main(String[] args) {
         clearConsole();
-
+        System.out.println("Welcome");
         System.out.println(title);
         System.out.println("Version: " + Colors.GREEN_BOLD_BRIGHT+VERSION +"v"+Colors.RESET);
         System.out.println();

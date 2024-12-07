@@ -78,9 +78,27 @@ public class Main {
         System.out.println("Do another Scrap? [Y/N]");
         System.out.printf("[" + Colors.GREEN + "INPUT" + Colors.RESET + "]: ");
         String input = usrInput.nextLine();
-        usrInput.nextLine(); // Puffer leeren
+        //usrInput.nextLine(); // Puffer leeren
         if(input.equalsIgnoreCase("Y")) {
+            clearConsole();
+            System.out.println("Welcome");
+            System.out.println(title);
+            System.out.println("Version: " + Colors.GREEN_BOLD_BRIGHT + VERSION + "v" + Colors.RESET);
+            System.out.println();
+            // Init
+            initialize();
+
+            // Input
             initialInput();
+
+            scrape();
+
+            // Verarbeite alle gesammelten Seiten
+            startAnimationThread("Products in Store", 2);
+            scrapeAllCollectedSites();
+            stopAnimationThread();
+
+            driver.quit();
         }else {
             System.out.println("Bye :D");
         }

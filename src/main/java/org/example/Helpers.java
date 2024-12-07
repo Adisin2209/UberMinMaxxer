@@ -10,8 +10,6 @@ import static org.example.Main.settingsAdd;
 
 public class Helpers {
 
-    public static String filePath = "cfg/links.txt";
-    //public static String blockPath = "cfg/blocks.txt";
     private static Thread animation; // Shared animation thread
     public static Map<String, String> linksWithNames = new HashMap<>();
 
@@ -95,7 +93,7 @@ public class Helpers {
     }
 
     public static void fetchLinks() {
-
+        String filePath = "links.txt";
 
         // Map zurücksetzen
         linksWithNames.clear();
@@ -138,7 +136,7 @@ public class Helpers {
     }
 
     public static void AddPreset(String locationName, String link) {
-
+        String filePath = "links.txt";
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             // Format der neuen Zeilen
@@ -188,7 +186,7 @@ public class Helpers {
     }
 
     public static void removePreset(int index) {
-
+        String filePath = "links.txt";
         List<String> fileContent = new ArrayList<>();
         int currentIndex = 0;
 

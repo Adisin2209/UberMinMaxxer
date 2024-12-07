@@ -23,7 +23,7 @@ public class Main {
 
     //region Variables
 
-    public static float VERSION = 1.3f;
+    public static float VERSION = 1.31f;
 
     public static WebDriver driver;
     public static String cUrl;

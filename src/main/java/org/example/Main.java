@@ -266,7 +266,13 @@ public class Main {
                             if (!isDuplicate) {
                                 articles.add(article);
                                 stopAnimationThread();
-                                System.out.println(">" + article.title + " " + article.Price);
+
+                                String priceString = article.Price;
+                                priceString = priceString.replace("€", "").trim();
+                                priceString = priceString.replace(",", ".");
+                                float price = Float.parseFloat(priceString);
+
+                                System.out.println(">" + article.title + " " + article.Price + " => " + price/2+"/Person");
                                 startAnimationThread("Products in NEXT Store", 2);
                             }
                         }

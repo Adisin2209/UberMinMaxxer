@@ -63,11 +63,7 @@ elif [ "$distro" -eq 0 ]; then
     
     # Chromedriver installieren
     echo "Installing Chromedriver..."
-    wget https://chromedriver.storage.googleapis.com/92.0.4515.107/chromedriver_linux64.zip
-    unzip chromedriver_linux64.zip
-    sudo mv chromedriver /sbin/chromedriver
-    sudo chown root:root /sbin/chromedriver
-    sudo chmod +x /sbin/chromedriver
+    pip install webdriver-manager --break-system-packages
 
 else
     echo "Ungültige Eingabe. Bitte 1 oder 0 eingeben."

@@ -23,6 +23,8 @@ public class Main {
 
     //region Variables
 
+    public static float VERSION = 1.3f;
+
     public static WebDriver driver;
     public static String cUrl;
     public static volatile boolean isScraping = true;
@@ -54,8 +56,12 @@ public class Main {
 
     public static void main(String[] args) {
         clearConsole();
+
+        System.out.println(title);
+
         // Input
         Scanner usrInput = new Scanner(System.in);
+
         System.out.println("Uber Eats URL zum Scrapen angeben: ");
         System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
         cUrl = usrInput.nextLine();

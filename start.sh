@@ -6,11 +6,19 @@ REPO_URL="https://github.com/dein-benutzername/dein-repository.git"
 # Pfad zum lokalen Git-Repository
 REPO_PATH="."
 
+CLEAN_START_SCRIPT="./cleanstart.sh"
+
 # Überprüfen, ob die JAR-Datei existiert
 JAR_PATH="target/Uber_Minmaxxer-1.0-SNAPSHOT-jar-with-dependencies.jar"
 
 if [ ! -f "$JAR_PATH" ]; then
-    echo "Fehler: Die Datei $JAR_PATH wurde nicht gefunden. Bitte stellen Sie sicher, dass der Maven-Build erfolgreich war."
+    echo "Fehler: Die Datei $JAR_PATH wurde nicht gefunden."
+    if [ -f "$CLEAN_START_SCRIPT" ]; then
+        echo "Starte CleanStart-Skript..."
+        bash "$CLEAN_START_SCRIPT"
+    else
+        echo "Fehler: CleanStart-Skript $CLEAN_START_SCRIPT wurde nicht gefunden."
+    fi
     exit 1
 fi
 

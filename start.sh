@@ -42,6 +42,16 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
         echo "Hole die neuesten Änderungen..."
         git -C $REPO_PATH pull origin main
         echo "Update abgeschlossen."
+
+        # Starte CleanStart-Skript nach dem Update
+        if [ -f "$CLEAN_START_SCRIPT" ]; then
+            echo "Starte CleanStart-Skript..."
+            bash "$CLEAN_START_SCRIPT"
+            exit 0
+        else
+            echo "Fehler: CleanStart-Skript $CLEAN_START_SCRIPT wurde nicht gefunden."
+            exit 1
+        fi
     else
         echo "Update übersprungen. Starte mit der aktuellen Version."
     fi
@@ -49,7 +59,7 @@ else
     echo "Deine Version ist auf dem neuesten Stand."
 fi
 
-# Java-Befehl ausführen
+# Starte Java-Anwendung
 echo "Starte Uber_Minmaxxer..."
 java -jar "$JAR_PATH"
 

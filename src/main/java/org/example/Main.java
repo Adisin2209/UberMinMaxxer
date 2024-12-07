@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.sql.SQLOutput;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,9 +102,63 @@ public class Main {
         } else if (input.equals("1")) {
             deleteLastLines(4);
             pickPreset();
-        } else {
+        }else if (input.equals("2")) {
+            deleteLastLines(4);
+            SettingsMenu();
+        }
+        else {
             System.out.println("Invalid Option\n");
             initialInput(); // Rekursiver Aufruf bei ungültiger Eingabe
+        }
+    }
+
+    public static void settingsAdd(){
+
+        deleteLastLines(4);
+
+        String inputN;
+        String inputL;
+        Scanner f = new Scanner(System.in);
+
+        System.out.printf("["+Colors.GREEN+ "INPUT(NAME)"+Colors.RESET +"]: ");
+        inputN = f.nextLine();
+
+        System.out.printf("["+Colors.GREEN+ "INPUT(URL)"+Colors.RESET +"]: ");
+        inputL = f.nextLine();
+        AddPreset(inputN, inputL);
+        initialInput();
+    }
+
+    public static void SettingsMenu(){
+        Scanner usrInput = new Scanner(System.in);
+        System.out.println("0 - Add Preset");
+        System.out.println("1 - Remove Preset");
+        System.out.println("2 - View Presets");
+        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
+        int input = usrInput.nextInt();
+        if(input == 0) {
+            settingsAdd();
+        }
+        if(input == 1) {
+            deleteLastLines(4);
+
+            printLinks();
+            Scanner f = new Scanner(System.in);
+            int index;
+            System.out.println(Colors.RED_BOLD_BRIGHT+"Which Preset do you want to delete?"+Colors.RESET);
+            System.out.printf("["+Colors.GREEN+ "INPUT(INDEX)"+Colors.RESET +"]: ");
+            index = f.nextInt();
+            removePreset(index);
+            initialInput();
+        }
+        if(input == 2) {
+            deleteLastLines(4);
+            printLinks();
+            initialInput();
+        }
+        else{
+            System.out.println("Invalid Option\n");
+            initialInput();
         }
     }
 

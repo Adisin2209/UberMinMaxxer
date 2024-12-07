@@ -2,13 +2,11 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.io.*;
-import java.util.Map;
 
 import static org.example.Main.isScraping;
+import static org.example.Main.settingsAdd;
 
 public class Helpers {
 
@@ -94,9 +92,11 @@ public class Helpers {
         }
     }
 
-
-    public static void fetchLinks(){
+    public static void fetchLinks() {
         String filePath = "links.txt";
+
+        // Map zurücksetzen
+        linksWithNames.clear();
 
         // Prüfen, ob die Datei existiert
         File file = new File(filePath);
@@ -117,8 +117,76 @@ public class Helpers {
             }
         }
 
-        // Map zum Speichern von Namen und Links
-        //Map<String, String> linksWithNames = new HashMap<>();
+        // Datei einlesen und Map befüllen
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String name = null;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("Name:")) {
+                    name = line.substring(5).trim(); // "Name:" entfernen und trimmen
+                } else if (!line.isEmpty() && name != null) {
+                    linksWithNames.put(name, line);
+                    name = null; // Name zurücksetzen
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Fehler beim Lesen der Datei: " + e.getMessage());
+        }
+    }
+
+    public static void AddPreset(String locationName, String link) {
+        String filePath = "links.txt";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            // Format der neuen Zeilen
+            writer.write("Name: " + locationName + "\n");
+            writer.write(link + "\n");
+            writer.newLine(); // Fügt eine Leerzeile hinzu
+            System.out.println("Preset added: " + locationName);
+        } catch (IOException e) {
+            System.err.println("Fehler beim Hinzufügen des Presets: " + e.getMessage());
+        }
+
+        fetchLinks();
+        // Optional: Map aktualisieren, damit der neue Eintrag direkt verfügbar ist
+        linksWithNames.put(locationName, link);
+    }
+
+    public static void printLinks(){
+        fetchLinks();
+        if(!linksWithNames.isEmpty()) {
+            System.out.println("<========================================");
+            int i = 0;
+            for (Map.Entry<String, String> entry : linksWithNames.entrySet()) {
+                System.out.println();
+                System.out.println("Name: " + Colors.GREEN_BOLD + entry.getKey() + Colors.RESET);
+                System.out.println("Link: " + entry.getValue());
+                System.out.println("Index: " + i);
+                i++;
+                System.out.println();
+            }
+            System.out.println("========================================>");
+        }else{
+            noPresetsMessage();
+        }
+    }
+
+    public static void noPresetsMessage(){
+        System.out.println(Colors.RED+"You have no saved presets. Create one?"+Colors.YELLOW+" [Y/n]"+Colors.RESET);
+        Scanner usrInput = new Scanner(System.in);
+        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
+        String inp = usrInput.nextLine();
+        if(inp.equalsIgnoreCase("y")){
+            settingsAdd();
+
+        }
+    }
+
+    public static void removePreset(int index) {
+        String filePath = "links.txt";
+        List<String> fileContent = new ArrayList<>();
+        int currentIndex = 0;
 
         // Datei einlesen
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -128,33 +196,39 @@ public class Helpers {
                 line = line.trim();
                 if (line.startsWith("Name:")) {
                     // Namen extrahieren
-                    name = line.substring(5).trim(); // "Name:" entfernen und trimmen
+                    name = line;
                 } else if (!line.isEmpty() && name != null) {
-                    // Link speichern, wenn Name vorhanden ist
-                    linksWithNames.put(name, line);
+                    // Füge Name und Link hinzu, wenn es nicht der zu löschende Index ist
+                    if (currentIndex != index) {
+                        fileContent.add(name); // Name hinzufügen
+                        fileContent.add(line); // Link hinzufügen
+                    }
                     name = null; // Name zurücksetzen
+                    currentIndex++; // Index erhöhen
                 }
             }
         } catch (IOException e) {
             System.err.println("Fehler beim Lesen der Datei: " + e.getMessage());
+            return;
         }
 
-        // Links ausgeben
-
-
-    }
-
-    public static void printLinks(){
-
-        int i = 0;
-        for (Map.Entry<String, String> entry : linksWithNames.entrySet()) {
-            System.out.println("Name: " + Colors.GREEN_BOLD+entry.getKey()+Colors.RESET);
-            System.out.println("Link: " + entry.getValue());
-            System.out.println("Index: " + i);
-            i++;
-            System.out.println();
+        // Datei mit aktualisierten Einträgen neu schreiben
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false))) {
+            for (String contentLine : fileContent) {
+                writer.write(contentLine);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Fehler beim Schreiben der Datei: " + e.getMessage());
         }
+
+        // Aktualisiere die Map nach dem Löschen
+        fetchLinks();
+
+        System.out.println("Preset mit Index " + index + " wurde entfernt.");
+        printLinks();
     }
+
 
     public static void deleteLastLines(int numLines) {
         for (int i = 0; i < numLines; i++) {

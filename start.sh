@@ -22,11 +22,7 @@ if [ ! -f "$JAR_PATH" ]; then
     exit 1
 fi
 
-# Prüfen, ob lokale Änderungen vorliegen
-if [ "$(git -C $REPO_PATH status --porcelain)" ]; then
-    echo "Es gibt lokale Änderungen. Bitte committe oder stash deine Änderungen vor dem Update."
-    exit 1
-fi
+
 
 # Prüfen, ob lokale und Remote-Version übereinstimmen
 echo "Überprüfe auf Updates..."

@@ -24,7 +24,7 @@ public class Main {
 
     //region Variables
 
-    public static float VERSION = 1.40f;
+    public static float VERSION = 1.42f;
 
     public static WebDriver driver;
     public static String cUrl;
@@ -59,7 +59,7 @@ public class Main {
         clearConsole();
 
         System.out.println(title);
-        System.out.println("Version: " + VERSION +"v");
+        System.out.println("Version: " + Colors.GREEN_BOLD_BRIGHT+VERSION +"v"+Colors.RESET);
         System.out.println();
         // Init
         initialize();
@@ -102,7 +102,7 @@ public class Main {
             deleteLastLines(4);
             pickPreset();
         } else {
-            System.out.println("Invalid Option");
+            System.out.println("Invalid Option\n");
             initialInput(); // Rekursiver Aufruf bei ungültiger Eingabe
         }
     }
@@ -126,8 +126,9 @@ public class Main {
             Map.Entry<String, String> entry = entryList.get(input);
             cUrl = entry.getValue();
         }else{
-            System.out.println("Invalid Option");
             deleteLastLines(2);
+            System.out.println("Invalid Option");
+            pickPreset();
         }
 
 

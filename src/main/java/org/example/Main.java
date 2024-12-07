@@ -58,6 +58,7 @@ public class Main {
         clearConsole();
 
         System.out.println(title);
+        System.out.println("Version: " + VERSION +"v");
 
         // Input
         Scanner usrInput = new Scanner(System.in);

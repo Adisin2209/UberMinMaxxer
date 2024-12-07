@@ -1,21 +1,12 @@
 package org.example;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.sql.SQLOutput;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import org.example.Settings;
-
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,13 +16,12 @@ public class Main {
 
     //region Variables
 
-    public static float VERSION = 1.51f;
+    public static float VERSION = 1.6f;
 
     public static WebDriver driver;
     public static String cUrl;
     public static volatile boolean isScraping = true;
     public static int speedUp = 3;
-
     public static int foundOffers = 0;
 
     public static class Site {
@@ -44,54 +34,65 @@ public class Main {
         }
     }
 
-    public static class Article{
+    public static class Article {
         String title;
         String Price;
+
         public Article(String title, String Price) {
             this.title = title;
             this.Price = Price;
         }
     }
-    public static List<Site> scrapedSites = new ArrayList<>();
-    //endregion
 
+    public static List<Site> scrapedSites = new ArrayList<>();
+    public static Scanner usrInput = new Scanner(System.in); // Globaler Scanner
+
+    //endregion
 
     public static void main(String[] args) {
         clearConsole();
         System.out.println("Welcome");
         System.out.println(title);
-        System.out.println("Version: " + Colors.GREEN_BOLD_BRIGHT+VERSION +"v"+Colors.RESET);
+        System.out.println("Version: " + Colors.GREEN_BOLD_BRIGHT + VERSION + "v" + Colors.RESET);
         System.out.println();
         // Init
         initialize();
 
-
         // Input
         initialInput();
-
 
         scrape();
 
         // Verarbeite alle gesammelten Seiten
-
-        startAnimationThread("Products in Store",2);
+        startAnimationThread("Products in Store", 2);
         scrapeAllCollectedSites();
         stopAnimationThread();
 
         driver.quit();
-
-
+        end();
 
     }
 
+    public static void end() {
+        System.out.println(Colors.PURPLE_BOLD_BRIGHT+"\n[FINISHED"+Colors.RESET+"]");
+        System.out.println("Do another Scrap? [Y/N]");
+        System.out.printf("[" + Colors.GREEN + "INPUT" + Colors.RESET + "]: ");
+        String input = usrInput.nextLine();
+        usrInput.nextLine(); // Puffer leeren
+        if(input.equalsIgnoreCase("Y")) {
+            initialInput();
+        }else {
+            System.out.println("Bye :D");
+        }
 
+    }
 
-    public static void initialInput(){
+    public static void initialInput() {
+        fetchLinks();
         System.out.println("0 - Scrap custom URL");
         System.out.println("1 - Scrap preset");
         System.out.println("2 - Settings");
-        Scanner usrInput = new Scanner(System.in);
-        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
+        System.out.printf("[" + Colors.GREEN + "INPUT" + Colors.RESET + "]: ");
         String input = usrInput.nextLine();
 
         if (input.equals("0")) {
@@ -100,109 +101,101 @@ public class Main {
         } else if (input.equals("1")) {
             deleteLastLines(4);
             pickPreset();
-        }else if (input.equals("2")) {
+        } else if (input.equals("2")) {
             deleteLastLines(4);
             SettingsMenu();
-        }
-        else {
+        } else {
             System.out.println("Invalid Option\n");
             initialInput(); // Rekursiver Aufruf bei ungültiger Eingabe
         }
     }
 
-    public static void settingsAdd(){
-
+    public static void settingsAdd() {
         deleteLastLines(4);
 
         String inputN;
         String inputL;
-        Scanner f = new Scanner(System.in);
 
-        System.out.printf("["+Colors.GREEN+ "INPUT(NAME)"+Colors.RESET +"]: ");
-        inputN = f.nextLine();
+        System.out.printf("[" + Colors.GREEN + "INPUT(NAME)" + Colors.RESET + "]: ");
+        inputN = usrInput.nextLine();
 
-        System.out.printf("["+Colors.GREEN+ "INPUT(URL)"+Colors.RESET +"]: ");
-        inputL = f.nextLine();
+        System.out.printf("[" + Colors.GREEN + "INPUT(URL)" + Colors.RESET + "]: ");
+        inputL = usrInput.nextLine();
         AddPreset(inputN, inputL);
         initialInput();
     }
 
-    public static void SettingsMenu(){
-        Scanner usrInput = new Scanner(System.in);
+    public static void SettingsMenu() {
         System.out.println("0 - Add Preset");
         System.out.println("1 - Remove Preset");
         System.out.println("2 - View Presets");
-        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
+        System.out.printf("[" + Colors.GREEN + "INPUT" + Colors.RESET + "]: ");
         int input = usrInput.nextInt();
-        if(input == 0) {
-            settingsAdd();
-        }
-        if(input == 1) {
-            deleteLastLines(4);
+        usrInput.nextLine(); // Puffer leeren
 
+        if (input == 0) {
+            settingsAdd();
+        } else if (input == 1) {
+            deleteLastLines(4);
             printLinks();
-            Scanner f = new Scanner(System.in);
-            int index;
-            System.out.println(Colors.RED_BOLD_BRIGHT+"Which Preset do you want to delete?"+Colors.RESET);
-            System.out.printf("["+Colors.GREEN+ "INPUT(INDEX)"+Colors.RESET +"]: ");
-            index = f.nextInt();
+            System.out.println(Colors.RED_BOLD_BRIGHT + "Which Preset do you want to delete?" + Colors.RESET);
+            System.out.printf("[" + Colors.GREEN + "INPUT(INDEX)" + Colors.RESET + "]: ");
+            int index = usrInput.nextInt();
+            usrInput.nextLine(); // Puffer leeren
             removePreset(index);
             initialInput();
-        }
-        if(input == 2) {
+        } else if (input == 2) {
             deleteLastLines(4);
             printLinks();
             initialInput();
-        }
-        else{
+        } else {
             System.out.println("Invalid Option\n");
             initialInput();
         }
     }
 
-    public static void getCustomUrl(){
-        Scanner usrInput = new Scanner(System.in);
+    public static void getCustomUrl() {
         System.out.println("Uber Eats URL to scrap: ");
-        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
+        System.out.printf("[" + Colors.GREEN + "INPUT" + Colors.RESET + "]: ");
         cUrl = usrInput.nextLine();
     }
 
-    public static void pickPreset(){
-        Scanner usrInput = new Scanner(System.in);
+    public static void pickPreset() {
+        fetchLinks();
+        if (linksWithNames.isEmpty()) {
+            System.out.println("No presets found. Please add one.");
+            return;
+        }
+
         System.out.println("Pick a saved location: ");
         printLinks();
-        System.out.printf("["+Colors.GREEN+ "INPUT(INDEX)"+Colors.RESET +"]: ");
-        Scanner usrInput2 = new Scanner(System.in);
-        int input = usrInput2.nextInt();
+        System.out.printf("[" + Colors.GREEN + "INPUT" + Colors.RESET + "]: ");
+        int input = usrInput.nextInt();
+        usrInput.nextLine(); // Puffer leeren
+
         List<Map.Entry<String, String>> entryList = new ArrayList<>(linksWithNames.entrySet());
-        if(input <= entryList.size() && input >= 0){
+
+        if (input >= 0 && input < entryList.size()) {
             Map.Entry<String, String> entry = entryList.get(input);
             cUrl = entry.getValue();
-        }else{
-            deleteLastLines(2);
+            System.out.println("Selected URL: " + cUrl); // Debug
+        } else {
             System.out.println("Invalid Option");
             pickPreset();
         }
-
-
     }
 
     public static void initialize() {
-
         fetchLinks();
         Logger seleniumLogger = Logger.getLogger("org.openqa.selenium");
         seleniumLogger.setLevel(Level.SEVERE);
-
-
-       // System.setProperty("webdriver.chrome.driver", "/sbin/chromedriver");
-
     }
 
     public static void scrape() {
         driver = new ChromeDriver();
         try {
             System.out.println();
-          startAnimationThread("Stores",1);
+            startAnimationThread("Stores",1);
             //  System.out.println(">Scraping started\n");
             driver.get(cUrl);
 
@@ -220,18 +213,18 @@ public class Main {
                         moreButton.click();
 
                         if(Settings.Debug)
-                        System.out.println("Mehr anzeigen Button geklickt...");
+                            System.out.println("Mehr anzeigen Button geklickt...");
 
                         Thread.sleep(2000/speedUp);
                         continue;
                     }
                 } catch (Exception e) {
                     if(Settings.Debug)
-                    System.out.println("Kein 'Mehr anzeigen'-Button gefunden.");
+                        System.out.println("Kein 'Mehr anzeigen'-Button gefunden.");
 
                 }
                 if(Settings.Debug)
-                System.out.println("Kein Button gefunden. Scrolling to the bottom of the page...");
+                    System.out.println("Kein Button gefunden. Scrolling to the bottom of the page...");
 
                 long lastHeight = (long) js.executeScript("return document.body.scrollHeight");
                 js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
@@ -244,7 +237,7 @@ public class Main {
             }
 
             if(Settings.Debug)
-            System.out.println("<===============Collecting Stores===============>\n");
+                System.out.println("<===============Collecting Stores===============>\n");
 
             List<WebElement> storeCards = driver.findElements(By.cssSelector("div[data-testid=store-card]"));
 
@@ -293,105 +286,83 @@ public class Main {
             System.out.println("Total Stores found: " + storeCards.size());
             System.out.println("Total Stores with offer: " + scrapedSites.size());
             System.out.println("<=====================================>");
-           // System.out.println();
+            // System.out.println();
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-         //   driver.quit();
-           // System.out.println("SUCCESSSS1");
+            //   driver.quit();
+            // System.out.println("SUCCESSSS1");
         }
     }
 
     public static void scrapeAllCollectedSites() {
-
-            for (Site site : scrapedSites) {
-                scrapeStorePage(site.storeName, site.storeLink);
-            }
-
+        for (Site site : scrapedSites) {
+            scrapeStorePage(site.storeName, site.storeLink);
+        }
     }
-
 
     public static void scrapeStorePage(String storeName, String storeLink) {
         try {
-
             driver.get(storeLink);
 
             List<Article> articles = new ArrayList<>();
-
             JavascriptExecutor js = (JavascriptExecutor) driver;
-            boolean endReached = false;
 
-            // Scroll to the bottom of the page
-            while (!endReached) {
+            // Scroll bis zum Seitenende
+            for (int i = 0; i < 10; i++) { // Maximal 10 Scrolls
                 long lastHeight = (long) js.executeScript("return document.body.scrollHeight");
                 js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
-                Thread.sleep(5000/speedUp);
+                Thread.sleep(3000); // Wartezeit für das Laden von Inhalten
                 long newHeight = (long) js.executeScript("return document.body.scrollHeight");
 
                 if (newHeight == lastHeight) {
-                    endReached = true;
+                    //ystem.out.println("Ende der Seite erreicht.");
+                    break;
                 }
             }
 
+            // Store-Items holen
             List<WebElement> storeItems = driver.findElements(By.cssSelector("li[data-testid^='store-item']"));
+            if (storeItems.isEmpty()) {
+                System.out.println("Keine Artikel im Store gefunden.");
+                return;
+            }
 
             boolean storePrinted = false;
 
             for (WebElement storeItem : storeItems) {
                 try {
-                    boolean hasOffer = false;
-
-                    List<WebElement> subDivs = storeItem.findElements(By.tagName("div"));
-                    for (WebElement subDiv : subDivs) {
-                        if (subDiv.getText().contains("Kaufe 1 und erhalte 1 kostenlos")) {
-                            hasOffer = true;
-                            break;
-                        }
-                    }
-
+                    // Prüfen, ob das Angebot existiert
+                    boolean hasOffer = storeItem.getText().contains("Kaufe 1 und erhalte 1 kostenlos");
                     if (hasOffer) {
-
                         if (!storePrinted) {
                             stopAnimationThread();
                             System.out.println("\u200E");
-                            System.out.println("=============================================================================");
-                            System.out.println("Store Name: " + storeName);
+                            // Store-Header nur einmal ausgeben
+                            System.out.println("=============================================");
+                            System.out.println("Name: " + storeName);
                             System.out.println("Link: " + storeLink);
-                          //  Helpers.startAnimationThread("Products in Store", 2);
                             storePrinted = true;
                         }
 
+                        // Artikelinformationen extrahieren
                         List<WebElement> richTextElements = storeItem.findElements(By.cssSelector("[data-testid='rich-text']"));
-
                         if (richTextElements.size() >= 2) {
-                            Article article = new Article(richTextElements.get(0).getText(), richTextElements.get(1).getText());
+                            String title = richTextElements.get(0).getText();
+                            String price = richTextElements.get(1).getText().replace("€", "").replace(",", ".").trim();
 
-                            boolean isDuplicate = false;
-                            for (Article article1 : articles) {
-                                if (article.title.equals(article1.title) && article.Price.equals(article1.Price)) {
-                                    isDuplicate = true;
-                                    break;
-                                }
-                            }
-
-                            if (!isDuplicate) {
-                                articles.add(article);
+                            // Duplikate prüfen
+                            if (articles.stream().noneMatch(a -> a.title.equals(title) && a.Price.equals(price))) {
                                 stopAnimationThread();
-
-                                String priceString = article.Price;
-                                priceString = priceString.replace("€", "").trim();
-                                priceString = priceString.replace(",", ".");
-                                float price = Float.parseFloat(priceString);
-
-                                System.out.println(">" + article.title + " " + article.Price + " => " + price/2+"/Person");
+                                articles.add(new Article(title, price));
+                                System.out.println("> " + title + " " + price + "€");
                                 startAnimationThread("Products in NEXT Store", 2);
                             }
                         }
                     }
-
                 } catch (Exception e) {
-                    System.out.println("Fehler beim Verarbeiten eines Store-Items: " + e.getMessage());
+                    System.out.println("Fehler beim Verarbeiten eines Artikels: " + e.getMessage());
                 }
             }
         } catch (Exception e) {

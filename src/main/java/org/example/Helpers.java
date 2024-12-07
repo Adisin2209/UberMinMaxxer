@@ -10,6 +10,8 @@ import static org.example.Main.settingsAdd;
 
 public class Helpers {
 
+    public static String filePath = "cfg/links.txt";
+    //public static String blockPath = "cfg/blocks.txt";
     private static Thread animation; // Shared animation thread
     public static Map<String, String> linksWithNames = new HashMap<>();
 
@@ -73,7 +75,7 @@ public class Helpers {
             Thread.currentThread().interrupt();
         }
         animation = null; // Reset animation thread
-      //  System.out.println(); // Optional: Clear line after stopping
+        //  System.out.println(); // Optional: Clear line after stopping
     }
 
     public static void clearConsole() {
@@ -93,7 +95,7 @@ public class Helpers {
     }
 
     public static void fetchLinks() {
-        String filePath = "links.txt";
+
 
         // Map zurücksetzen
         linksWithNames.clear();
@@ -107,7 +109,7 @@ public class Helpers {
                     // Standardinhalte hinzufügen
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                         writer.write("Name: Charlottenburg - Insitut Elektrotechnik Neubau\n");
-                        writer.write("https://www.ubereats.com/de/feed?diningMode=DELIVERY&pl=JTdCJTIyYWRkcmVzcyUyMiUzQSUyMkVpbnN0ZWludWZlciUyMDE3JTIyJTJDJTIycmVmZXJlbmNlJTIyJTNBJTIyZmZmNDM2NmEtMThjZS05ZWM5LTQwMDItNjA3NDI2NjgzYThiJTIyJTJDJTIycmVmZXJlbmNlVHlwZSUyMiUzQSUyMnViZXJfcGxhY2VzJTIyJTJDJTIybGF0aXR1ZGUlMjIlM0E1Mi41MTU1MSUyQyUyMmxvbmdpdHVkZSUyMiUzQTEzLjMyNjU4JTdE\n\n");
+                        writer.write("https://www.ubereats.com/de/feed?diningMode=DELIVERY&pl=JTdCJTIyYWRkcmVzcyUyMiUzQSUyMkVpbnN0ZWludWZlciUyMDE3JTIyJTJDJTIycmVmZXJlbmNlJTIyJTNBJTIyZmZmNDM2NmEtMThjZS05ZWM5LTQwMDItNjA3NDI2NjgzYThiJTIyJTJDJTIycmVmZXJlbmNlVHlwZSUyMiUzQSUyMnViZXJfcGxhY2VzJTIyJTJDJTIybGF0aXR1ZGUlMjIlM0E1Mi41MTU1MSUyQyUyMmxvbmdpdHVkZSUyMiUzQTEzLjMyNjU4JTdE&sf=JTVCJTdCJTIydXVpZCUyMiUzQSUyMjMzZTBmN2NjLTg5MjctNGRhYy1hOTJlLTE5YTI5NmFhYjA5NyUyMiUyQyUyMm9wdGlvbnMlMjIlM0ElNUIlN0IlMjJ1dWlkJTIyJTNBJTIyZzk5NjQ3NmMtMmIxYi00ZGIyLWI0MGEtMTNkNDNjYjExN2RjJTIyJTdEJTVEJTdEJTJDJTdCJTIydXVpZCUyMiUzQSUyMmNjNWNkYjk1LWE2ZTYtNDM3MS04ZDEwLWEwN2MyMTc1ZTUwOSUyMiUyQyUyMm9wdGlvbnMlMjIlM0ElNUIlN0IlMjJ1dWlkJTIyJTNBJTIyY2M1Y2RiOTUtYTZlNi00MzcxLThkMTAtYTA3YzIxNzVlNTEwJTIyJTdEJTVEJTdEJTVE\n\n");
                     }
                     System.out.println("links.txt has been created with default content.");
                 }
@@ -136,9 +138,10 @@ public class Helpers {
     }
 
     public static void AddPreset(String locationName, String link) {
-        String filePath = "links.txt";
+
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            // Format der neuen Zeilen
             // Format der neuen Zeilen
             writer.write("Name: " + locationName + "\n");
             writer.write(link + "\n");
@@ -151,6 +154,7 @@ public class Helpers {
         fetchLinks();
         // Optional: Map aktualisieren, damit der neue Eintrag direkt verfügbar ist
         linksWithNames.put(locationName, link);
+        fetchLinks();
     }
 
     public static void printLinks(){
@@ -184,7 +188,7 @@ public class Helpers {
     }
 
     public static void removePreset(int index) {
-        String filePath = "links.txt";
+
         List<String> fileContent = new ArrayList<>();
         int currentIndex = 0;
 

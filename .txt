@@ -1,3 +1,0 @@
-[H[2Jtest
-Uber Eats URL zum Scrapen angeben: 
-[[0;32mINPUT[0m]: 

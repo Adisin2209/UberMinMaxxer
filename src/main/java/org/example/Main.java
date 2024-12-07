@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import org.example.Settings;
 
@@ -23,7 +24,7 @@ public class Main {
 
     //region Variables
 
-    public static float VERSION = 1.31f;
+    public static float VERSION = 1.32f;
 
     public static WebDriver driver;
     public static String cUrl;
@@ -59,39 +60,87 @@ public class Main {
 
         System.out.println(title);
         System.out.println("Version: " + VERSION +"v");
-
-        // Input
-        Scanner usrInput = new Scanner(System.in);
-
-        System.out.println("Uber Eats URL zum Scrapen angeben: ");
-        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
-        cUrl = usrInput.nextLine();
-
-
+        System.out.println();
         // Init
         initialize();
 
+
+        // Input
+        initialInput();
+
+
+        scrapAIO();
+
+
+
+    }
+
+    public static void scrapAIO() {
+        driver = new ChromeDriver();
         // Scrape
         scrape();
 
         // Verarbeite alle gesammelten Seiten
 
         startAnimationThread("Products in Store",2);
-
         scrapeAllCollectedSites();
-
-
         stopAnimationThread();
+    }
+
+    public static void initialInput(){
+        System.out.println("0 - Scrap custom URL");
+        System.out.println("1 - Scrap preset");
+        System.out.println("2 - Settings");
+        Scanner usrInput = new Scanner(System.in);
+        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
+        String input = usrInput.nextLine();
+
+        if (input.equals("0")) {
+            deleteLastLines(4);
+            getCustomUrl();
+        } else if (input.equals("1")) {
+            deleteLastLines(4);
+            pickPreset();
+        } else {
+            System.out.println("Invalid Option");
+            initialInput(); // Rekursiver Aufruf bei ungültiger Eingabe
+        }
+    }
+
+    public static void getCustomUrl(){
+        Scanner usrInput = new Scanner(System.in);
+        System.out.println("Uber Eats URL to scrap: ");
+        System.out.printf("["+Colors.GREEN+ "INPUT"+Colors.RESET +"]: ");
+        cUrl = usrInput.nextLine();
+    }
+
+    public static void pickPreset(){
+        Scanner usrInput = new Scanner(System.in);
+        System.out.println("Pick a saved location: ");
+        printLinks();
+        System.out.printf("["+Colors.GREEN+ "INPUT(INDEX)"+Colors.RESET +"]: ");
+        Scanner usrInput2 = new Scanner(System.in);
+        int input = usrInput2.nextInt();
+        List<Map.Entry<String, String>> entryList = new ArrayList<>(linksWithNames.entrySet());
+        if(input <= entryList.size() && input >= 0){
+            Map.Entry<String, String> entry = entryList.get(input);
+            cUrl = entry.getValue();
+        }else{
+            System.out.println("Invalid Option");
+            deleteLastLines(2);
+        }
+
 
     }
 
     public static void initialize() {
+        fetchLinks();
         Logger seleniumLogger = Logger.getLogger("org.openqa.selenium");
         seleniumLogger.setLevel(Level.SEVERE);
 
 
        // System.setProperty("webdriver.chrome.driver", "/sbin/chromedriver");
-        driver = new ChromeDriver();
+
     }
 
     public static void scrape() {

@@ -1,10 +1,20 @@
 package org.example;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.io.*;
+import java.util.Map;
 
 import static org.example.Main.isScraping;
 
 public class Helpers {
 
     private static Thread animation; // Shared animation thread
+    public static Map<String, String> linksWithNames = new HashMap<>();
+
 
     public static Thread animationThread(String x, int param) {
         return new Thread(() -> {
@@ -81,6 +91,76 @@ public class Helpers {
         } catch (final Exception e) {
             // Handle any exceptions.
             e.printStackTrace();
+        }
+    }
+
+
+    public static void fetchLinks(){
+        String filePath = "links.txt";
+
+        // Prüfen, ob die Datei existiert
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("No links.txt found. Generating...");
+            try {
+                if (file.createNewFile()) {
+                    // Standardinhalte hinzufügen
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                        writer.write("Name: Charlottenburg - Insitut Elektrotechnik Neubau\n");
+                        writer.write("https://www.ubereats.com/de/feed?diningMode=DELIVERY&pl=JTdCJTIyYWRkcmVzcyUyMiUzQSUyMkVpbnN0ZWludWZlciUyMDE3JTIyJTJDJTIycmVmZXJlbmNlJTIyJTNBJTIyZmZmNDM2NmEtMThjZS05ZWM5LTQwMDItNjA3NDI2NjgzYThiJTIyJTJDJTIycmVmZXJlbmNlVHlwZSUyMiUzQSUyMnViZXJfcGxhY2VzJTIyJTJDJTIybGF0aXR1ZGUlMjIlM0E1Mi41MTU1MSUyQyUyMmxvbmdpdHVkZSUyMiUzQTEzLjMyNjU4JTdE\n\n");
+                    }
+                    System.out.println("links.txt has been created with default content.");
+                }
+            } catch (IOException e) {
+                System.err.println("Error creating links.txt: " + e.getMessage());
+                return;
+            }
+        }
+
+        // Map zum Speichern von Namen und Links
+        //Map<String, String> linksWithNames = new HashMap<>();
+
+        // Datei einlesen
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String name = null;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("Name:")) {
+                    // Namen extrahieren
+                    name = line.substring(5).trim(); // "Name:" entfernen und trimmen
+                } else if (!line.isEmpty() && name != null) {
+                    // Link speichern, wenn Name vorhanden ist
+                    linksWithNames.put(name, line);
+                    name = null; // Name zurücksetzen
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Fehler beim Lesen der Datei: " + e.getMessage());
+        }
+
+        // Links ausgeben
+
+
+    }
+
+    public static void printLinks(){
+
+        int i = 0;
+        for (Map.Entry<String, String> entry : linksWithNames.entrySet()) {
+            System.out.println("Name: " + Colors.GREEN_BOLD+entry.getKey()+Colors.RESET);
+            System.out.println("Link: " + entry.getValue());
+            System.out.println("Index: " + i);
+            i++;
+            System.out.println();
+        }
+    }
+
+    public static void deleteLastLines(int numLines) {
+        for (int i = 0; i < numLines; i++) {
+            // Move cursor up one line and clear the line
+            System.out.print("\033[F"); // Move cursor up
+            System.out.print("\033[2K"); // Clear the entire line
         }
     }
 

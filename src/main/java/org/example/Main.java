@@ -25,12 +25,12 @@ public class Main {
 
     //region Variables
 
-    public static float VERSION = 1.44f;
+    public static float VERSION = 1.5f;
 
     public static WebDriver driver;
     public static String cUrl;
     public static volatile boolean isScraping = true;
-    public static int speedUp = 2;
+    public static int speedUp = 3;
 
     public static int foundOffers = 0;
 
@@ -70,15 +70,6 @@ public class Main {
         initialInput();
 
 
-        scrapAIO();
-
-
-
-    }
-
-    public static void scrapAIO() {
-        driver = new ChromeDriver();
-        // Scrape
         scrape();
 
         // Verarbeite alle gesammelten Seiten
@@ -86,7 +77,14 @@ public class Main {
         startAnimationThread("Products in Store",2);
         scrapeAllCollectedSites();
         stopAnimationThread();
+
+        driver.quit();
+
+
+
     }
+
+
 
     public static void initialInput(){
         System.out.println("0 - Scrap custom URL");
@@ -190,6 +188,7 @@ public class Main {
     }
 
     public static void initialize() {
+
         fetchLinks();
         Logger seleniumLogger = Logger.getLogger("org.openqa.selenium");
         seleniumLogger.setLevel(Level.SEVERE);
@@ -200,6 +199,7 @@ public class Main {
     }
 
     public static void scrape() {
+        driver = new ChromeDriver();
         try {
             System.out.println();
           startAnimationThread("Stores",1);
@@ -298,23 +298,23 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            driver.quit();
+         //   driver.quit();
+           // System.out.println("SUCCESSSS1");
         }
     }
 
     public static void scrapeAllCollectedSites() {
-        // Reinitialisiere den Driver für die nächste Phase
-        initialize();
 
-        for (Site site : scrapedSites) {
-            scrapeStorePage(site.storeName, site.storeLink);
-        }
+            for (Site site : scrapedSites) {
+                scrapeStorePage(site.storeName, site.storeLink);
+            }
 
-
-        driver.quit();
     }
+
+
     public static void scrapeStorePage(String storeName, String storeLink) {
         try {
+
             driver.get(storeLink);
 
             List<Article> articles = new ArrayList<>();
@@ -326,7 +326,7 @@ public class Main {
             while (!endReached) {
                 long lastHeight = (long) js.executeScript("return document.body.scrollHeight");
                 js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
-                Thread.sleep(2000/speedUp);
+                Thread.sleep(5000/speedUp);
                 long newHeight = (long) js.executeScript("return document.body.scrollHeight");
 
                 if (newHeight == lastHeight) {
